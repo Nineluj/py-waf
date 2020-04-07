@@ -7,6 +7,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY run.py .
+COPY src ./src
 
 CMD ["python", "/app/run.py"]
