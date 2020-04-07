@@ -1,6 +1,6 @@
 # WAF in Python
 
-## Get Started
+## Setup for local development
 1. Create venv for Python 3.8 (in the root directory of the project)
     ```shell script
    python --version
@@ -15,3 +15,4 @@
     ```shell script
    pip install -r requirements.txt 
    ```
+
