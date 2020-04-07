@@ -1,9 +1,12 @@
-FROM python:3
+FROM python:3.8.2
 
-# RUN pip3 install protobuf pynacl passlib argon2_cffi pyyaml
-
+# Set up working directory
 WORKDIR /app
 
-ADD . /app/
+# Install required packages
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["/bin/bash"]
+COPY . .
+
+CMD ["python", "/app/run.py"]
