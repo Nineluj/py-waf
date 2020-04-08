@@ -17,12 +17,6 @@ limiter = Limiter(
 USAGE = "Run with --help for options"
 app.register_blueprint(reverse_proxy)
 
-
-@app.route('/hello')
-def index() -> str:
-    return 'Hello'
-
-
 @click.command()
 @click.option('--config-path', '-c', help='Path to config file', metavar='PATH')
 def main(config_path) -> None:
