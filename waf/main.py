@@ -2,8 +2,8 @@ import click
 import logging
 
 from flask import Flask
-from helper import parse_config
-from reverse_proxy import reverse_proxy
+from .helper import parse_config
+from .reverse_proxy import reverse_proxy
 
 
 app = Flask(__name__)
