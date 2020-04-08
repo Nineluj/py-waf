@@ -2,6 +2,8 @@ from flask import request, Blueprint, current_app as app, redirect
 import requests
 from urllib.parse import urlparse
 from typing import List, Dict, Tuple
+from waf.form_parsing import Verifier
+from waf.modules.sql_injection_check import sql_injection_check
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
@@ -52,6 +54,7 @@ def proxy(path):
         return make_400()
 
     app_url = get_app_url(path)
+    verf = Verifier()
 
     if request.method == 'GET':
         app.logger.info(f"Retrieving URL: {app_url}")
@@ -71,6 +74,15 @@ def proxy(path):
     elif request.method == "POST":
         app_request_headers = filter_headers_app_request(dict(request.headers))
         resp = requests.post(url=app_url, data=request.get_data(), headers=app_request_headers)
+
+        # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
+        verf.add_check(sql_injection_check)
+        if not verf.parse_form(request.form):
+            # Basic DEBUG information
+            for i in request.form:
+                app.logger.debug(f"Entry: [{request.form[i]}] ~|~ Key: {i}")
+            app.logger.debug("Failed verifier")
+            return make_400()
         return resp.content, resp.status_code, get_filtered_headers_client_response(resp)
     else:
         # TODO: Implement other methods
