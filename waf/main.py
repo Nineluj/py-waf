@@ -2,11 +2,18 @@ import click
 import logging
 
 from flask import Flask
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from .helper import parse_config
 from .reverse_proxy import reverse_proxy
 
 
 app = Flask(__name__)
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["5000/day", "500/hour"]
+)
 USAGE = "Run with --help for options"
 app.register_blueprint(reverse_proxy)
 
