@@ -1,3 +1,3 @@
 if __name__ == "__main__":
-    from src.main import main
+    from waf.main import main
     main()
