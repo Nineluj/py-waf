@@ -1,11 +1,11 @@
-from flask import request, Blueprint, current_app as app, redirect
-import requests
-from urllib.parse import urlparse
 from typing import List, Dict, Tuple
-from waf.form_parsing import Verifier
-from waf.form_template import FormTemplate, FormKey
-from waf.modules.sql_injection_check import sql_injection_check
+from urllib.parse import urlparse
 
+import requests
+from flask import escape, request, Blueprint, current_app as app, redirect
+
+from waf.form_parsing import Verifier
+from waf.form_template import FormTemplate
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
@@ -22,7 +22,7 @@ def get_app_url(path: str) -> str:
     rest = ""
 
     if request.query_string:
-        qs = request.query_string.decode()
+        qs = escape(request.query_string.decode())
         rest = f"?{qs}"
 
     if "http://" in server_addr:
