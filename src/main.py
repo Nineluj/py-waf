@@ -12,7 +12,6 @@ app = Flask(__name__)
 def index():
     return 'Hello'
 
-
 @click.command()
 @click.option('--config', help='Path to config file', metavar='PATH')
 def main(config):
