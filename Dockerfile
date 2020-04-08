@@ -8,6 +8,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 ENV PYTHONPATH "${PYTHONPATH}:/app/src/"
+COPY run.py ./run.py
 COPY src ./src
 
-ENTRYPOINT ["python", "/app/src/main.py"]
+ENTRYPOINT ["python", "/app/run.py"]

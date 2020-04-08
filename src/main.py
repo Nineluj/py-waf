@@ -37,7 +37,3 @@ def main(config_path) -> None:
         app.config[k] = v
 
     app.run(host='0.0.0.0', port=config['port'], debug=config['debug'])
-
-
-if __name__ == "__main__":
-    main()
