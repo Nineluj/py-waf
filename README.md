@@ -21,7 +21,12 @@
 5. Run `./run.py --config <path to config>`
 
  ## Testing app
- 1. Run this container like so
+1. Run the testing container like so
     ```
-    docker run --rm -it -p 8080:80 vulnerables/web-dvwa
+    docker run -it --name vuln_app -p 4040:4040 santosomar/vuln_app:latest /bin/bash
+    ```
+
+2. Run the WAF like so
+    ```shell script
+   docker run -v local:container -it pywaf --config <path_to_config> 
     ```
