@@ -2,11 +2,11 @@ from yaml import safe_load
 import logging
 
 
-def parse_config(config: str) -> object:
+def parse_config(config_path: str) -> object:
     """
     Load the config from the provided path and return it.
     """
-    config = safe_load(open(config))
+    config = safe_load(open(config_path))
     REQUIRED_KEYS = [
         'server_addr',
         'port'

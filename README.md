@@ -28,5 +28,5 @@
 
 2. Run the WAF like so
     ```shell script
-   docker run -v local:container -it pywaf --config <path_to_config> 
+   docker run -v <local>:<container> -it pywaf --config <path_to_config> 
     ```
