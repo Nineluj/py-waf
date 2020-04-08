@@ -20,13 +20,25 @@
 
 5. Run `./run.py --config <path to config>`
 
- ## Testing app
-1. Run the testing container like so
+## Testing app
+
+### For Docker
+1. Run the testing container
     ```
     docker run -it --name vuln_app -p 4040:4040 santosomar/vuln_app:latest /bin/bash
     ```
 
-2. Run the WAF like so
+2. Run the WAF
     ```shell script
    docker run -v <local>:<container> -it pywaf --config <path_to_config> 
+    ```
+
+### With Podman
+1. Run the testing container
+    ```shell script
+    podman run -it --name vuln_app --pod new:waf -p 4040:4040 -p 9991:80 santosomar/vuln_app:latest /bin/bash
+    ```
+2. Run the WAF
+    ```shell script
+   podman run -it --pod waf -v <local>:/tmp/dir --rm pywaf -c /tmp/dir/config.yml
     ```
