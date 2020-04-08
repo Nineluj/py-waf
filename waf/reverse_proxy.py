@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 
 import requests
 from flask import escape, request, Blueprint, current_app as app, redirect
+from werkzeug.datastructures import MultiDict
+from werkzeug.urls import url_encode
 
 from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
@@ -22,7 +24,12 @@ def get_app_url(path: str) -> str:
     rest = ""
 
     if request.query_string:
-        qs = escape(request.query_string.decode())
+        qs = []
+        for arg in request.args:
+            qs.append((arg, escape(request.args[arg])))
+        qs = MultiDict(qs)
+        qs = url_encode(qs)
+        print(qs)
         rest = f"?{qs}"
 
     if "http://" in server_addr:
