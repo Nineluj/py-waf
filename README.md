@@ -15,6 +15,11 @@
     ```shell script
    pip install -r requirements.txt 
    ```
+   
+4. Validate the config. A sample config is provided in `config/config.sample.yml`
+
+5. Run `./run.py --config <path to config>`
+
  ## Testing app
  1. Run this container like so
     ```
