@@ -21,6 +21,8 @@ def get_app_url(path: str) -> str:
         qs = request.query_string.decode()
         rest = f"?{qs}"
 
+    if "http://" in server_addr:
+        return f"{server_addr}/{path}{rest}"
     return f"http://{server_addr}/{path}{rest}"
 
 
@@ -52,6 +54,7 @@ def proxy(path):
     app_url = get_app_url(path)
 
     if request.method == 'GET':
+        app.logger.info(f"Retrieving URL: {app_url}")
         resp = requests.get(url=app_url, allow_redirects=False)
         headers = get_filtered_headers_client_response(resp)
 
