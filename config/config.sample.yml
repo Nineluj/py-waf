@@ -1,3 +1,6 @@
 server_addr: 'localhost:8000'
 port: 9000
 debug: Yes
+use_ssl: No
+ssl_cert: '.../cert.pem'
+ssl_key: '.../key.pem'
