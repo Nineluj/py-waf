@@ -26,14 +26,23 @@ def main(config_path) -> None:
 
     config = parse_config(config_path)
 
-    if config['debug']:
-        logging.basicConfig(level=logging.DEBUG)
-
-    logging.debug(f'Loaded config as {config}')
-
     # Copy the config key-pair values to the app config to make them accessible
     # in other places.
     for k, v in config.items():
         app.config[k] = v
 
-    app.run(host='0.0.0.0', port=config['port'], debug=config['debug'])
+    # Set up the app
+    if config['debug']:
+        logging.basicConfig(level=logging.DEBUG)
+
+    logging.debug(f'Loaded config as {config}')
+
+    # Set up SSL if configured to
+    security_context = None
+
+    if config['use_ssl']:
+        cert = config['ssl_cert']
+        key = config['ssl_key']
+        security_context = (cert, key)
+
+    app.run(host='0.0.0.0', port=config['port'], debug=config['debug'], ssl_context=security_context)
