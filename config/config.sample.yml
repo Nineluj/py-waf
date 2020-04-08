@@ -1,6 +1,6 @@
-server_addr: 'localhost:8000'
+server_addr: '172.17.0.1:9991'
 port: 9000
 debug: Yes
 use_ssl: No
-ssl_cert: '.../cert.pem'
-ssl_key: '.../key.pem'
+ssl_cert: 'config/cert.pem'
+ssl_key: 'config/key.pem'
