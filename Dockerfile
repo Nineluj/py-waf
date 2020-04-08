@@ -7,7 +7,7 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY run.py .
+ENV PYTHONPATH "${PYTHONPATH}:/app/src/"
 COPY src ./src
 
-CMD ["python", "/app/run.py"]
+ENTRYPOINT ["python", "/app/src/main.py"]
