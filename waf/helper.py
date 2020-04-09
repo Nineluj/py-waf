@@ -1,5 +1,4 @@
 from yaml import safe_load
-import logging
 
 
 def parse_config(config_path: str, app) -> object:

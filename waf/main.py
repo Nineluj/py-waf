@@ -9,7 +9,6 @@ from flask_talisman import Talisman
 from .helper import parse_config
 from .reverse_proxy import reverse_proxy
 
-
 app = Flask(__name__)
 
 limiter = Limiter(
@@ -19,6 +18,7 @@ limiter = Limiter(
 )
 USAGE = "Run with --help for options"
 app.register_blueprint(reverse_proxy)
+
 
 @click.command()
 @click.option('--config-path', '-c', help='Path to config file', metavar='PATH')
@@ -48,7 +48,7 @@ def main(config_path) -> None:
     security_headers_flag = config['modules'].pop('security_headers', True)
     if security_headers_flag:
         """Read this from config actually. This config is quite unsafe but it is here to make the vuln-app work."""
-        Talisman(app, content_security_policy = {
+        Talisman(app, content_security_policy={
             'default-src': '\'self\'',
             'style-src': ['\'unsafe-inline\'', '\'self\''],
             'script-src': ['\'self\'', '\'unsafe-inline\'']
