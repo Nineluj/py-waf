@@ -37,3 +37,18 @@
     margin-top: 30px;
     color: midnightblue;
 }
+
+.navback-container {
+    text-align: center;
+
+}
+
+.navback {
+    margin: 25px auto 5px auto;
+    text-decoration: none;
+    width: 150px;
+    background: dimgray;
+    border-radius: 15px;
+    color: whitesmoke;
+    cursor: pointer;
+}

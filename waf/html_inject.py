@@ -4,6 +4,7 @@ BODY_TAG = "<body"
 
 
 def inject_warning(page: bytes):
+    # TODO: load the stylesheet separately into the head of the document
     warn = render_template("/warning.html", info="Warning will be displayed here!")
     return inject(page.decode(encoding='UTF-8'), warn).encode(encoding='UTF-8')
 
