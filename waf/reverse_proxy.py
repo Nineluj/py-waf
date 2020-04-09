@@ -9,6 +9,7 @@ from waf.form_template import FormTemplate
 from waf.modules.xss import XSSCheck
 
 from helper import make_error_page
+from html_inject import inject_warning
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
@@ -87,8 +88,16 @@ def proxy(path):
 
             return redirect(new_resource_path, code=resp.status_code)
 
+        content = resp.content
+
+        if isinstance(content, (bytes, bytearray)) \
+                and "Content-Type" in resp.headers \
+                and "text/html" in resp.headers['Content-Type']:
+            content = inject_warning(content)
+            # content
+
         # Flask routes can accept tuple (content, status, headers)
-        return resp.content, resp.status_code, headers
+        return content, resp.status_code, headers
     elif request.method == "POST":
         app_request_headers = filter_headers_app_request(dict(request.headers))
         resp = requests.post(url=app_url, data=request.get_data(), headers=app_request_headers)
