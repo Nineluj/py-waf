@@ -1,4 +1,4 @@
-from waf.modules.sql_injection_check import sql_injection_check
+from waf.modules.sqli import sql_injection_check
 from waf.modules.test import test
 
 """

@@ -5,6 +5,7 @@ use_ssl: Yes
 ssl_cert: 'config/cert.pem'
 ssl_key: 'config/key.pem'
 modules:
-  sql_injection: Yes
+  sqli: Yes
   xss: Yes
   security_headers: Yes
+  rate_limiter: Yes

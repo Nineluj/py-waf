@@ -6,7 +6,7 @@ from flask import request, Blueprint, current_app as app, redirect
 
 from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
-from waf.modules.xss_check import XSSCheck
+from waf.modules.xss import XSSCheck
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
