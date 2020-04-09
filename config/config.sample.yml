@@ -4,6 +4,7 @@ debug: Yes
 use_ssl: Yes
 ssl_cert: 'config/cert.pem'
 ssl_key: 'config/key.pem'
+timeout: 5  #{timeout in seconds}
 modules:
   sqli:
     enabled: Yes

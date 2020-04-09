@@ -79,9 +79,17 @@ def proxy(path):
     except XSSException as ex:
         return make_error_page(666, str(ex))
 
+    if 'timeout' in app.config:
+        timeout = app.config['timeout']
+    else:
+        timeout = 5
+
     if request.method == 'GET':
         app.logger.info(f"Retrieving URL: {app_url}")
-        resp = requests.get(url=app_url, allow_redirects=False)
+        # TODO: add headers here like for POST?
+        resp = requests.get(url=app_url,
+                            allow_redirects=False,
+                            timeout=timeout)
         headers = get_filtered_headers_client_response(resp)
 
         # We need to handle redirects correctly
@@ -104,7 +112,10 @@ def proxy(path):
         return content, resp.status_code, headers
     elif request.method == "POST":
         app_request_headers = filter_headers_app_request(dict(request.headers))
-        resp = requests.post(url=app_url, data=request.get_data(), headers=app_request_headers)
+        resp = requests.post(url=app_url,
+                             data=request.get_data(),
+                             headers=app_request_headers,
+                             timeout=timeout)
 
         # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
         verf = Verifier(FormTemplate(path), request.form)
