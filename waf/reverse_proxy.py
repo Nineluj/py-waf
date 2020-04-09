@@ -24,12 +24,12 @@ def get_app_url(path: str) -> str:
     rest = ""
 
     if request.query_string:
+
+        """Parse and escape any query parameters"""
         qs = []
         for arg in request.args:
             qs.append((arg, escape(request.args[arg])))
-        qs = MultiDict(qs)
-        qs = url_encode(qs)
-        print(qs)
+        qs = url_encode(MultiDict(qs))
         rest = f"?{qs}"
 
     if "http://" in server_addr:

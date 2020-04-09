@@ -1,6 +1,10 @@
 server_addr: '172.17.0.1:9991'
 port: 9000
 debug: Yes
-use_ssl: No
+use_ssl: Yes
 ssl_cert: 'config/cert.pem'
 ssl_key: 'config/key.pem'
+modules:
+  sql_injection: Yes
+  xss: Yes
+  security_headers: Yes
