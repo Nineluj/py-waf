@@ -1,6 +1,3 @@
-from waf.form_template import FormKey, FormTemplate
-import re
-
 class Verifier:
     def __init__(self, form_temp, form):
         self.form_template = form_temp
@@ -24,6 +21,3 @@ class Verifier:
                         return False
                 return True
         return True
-
-
-

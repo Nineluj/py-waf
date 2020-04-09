@@ -4,11 +4,13 @@ import logging
 from flask import Flask
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
+
 from .helper import parse_config
 from .reverse_proxy import reverse_proxy
 
-
 app = Flask(__name__)
+
 limiter = Limiter(
     app,
     key_func=get_remote_address,
@@ -16,11 +18,6 @@ limiter = Limiter(
 )
 USAGE = "Run with --help for options"
 app.register_blueprint(reverse_proxy)
-
-
-@app.route('/hello')
-def index() -> str:
-    return 'Hello'
 
 
 @click.command()
@@ -31,18 +28,13 @@ def main(config_path) -> None:
         print(USAGE)
         exit(1)
 
-    config = parse_config(config_path)
-
-    # Copy the config key-pair values to the app config to make them accessible
-    # in other places.
-    for k, v in config.items():
-        app.config[k] = v
+    config = parse_config(config_path, app)
 
     # Set up the app
     if config['debug']:
-        logging.basicConfig(level=logging.DEBUG)
+        app.logger.setLevel(logging.DEBUG)
 
-    logging.debug(f'Loaded config as {config}')
+    app.logger.debug(f'Loaded config as {config}')
 
     # Set up SSL if configured to
     security_context = None
@@ -51,5 +43,15 @@ def main(config_path) -> None:
         cert = config['ssl_cert']
         key = config['ssl_key']
         security_context = (cert, key)
+
+    """Safe defaults for security headers"""
+    security_headers_flag = config['modules'].pop('security_headers', True)
+    if security_headers_flag:
+        """Read this from config actually. This config is quite unsafe but it is here to make the vuln-app work."""
+        Talisman(app, content_security_policy={
+            'default-src': '\'self\'',
+            'style-src': ['\'unsafe-inline\'', '\'self\''],
+            'script-src': ['\'self\'', '\'unsafe-inline\'']
+        })
 
     app.run(host='0.0.0.0', port=config['port'], debug=config['debug'], ssl_context=security_context)

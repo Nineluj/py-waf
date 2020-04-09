@@ -1,10 +1,13 @@
-from flask import request, Blueprint, current_app as app, redirect
-import requests
-from urllib.parse import urlparse
 from typing import List, Dict, Tuple
+from urllib.parse import urlparse
+
+import requests
+from flask import escape, request, Blueprint, current_app as app, redirect
+from werkzeug.datastructures import MultiDict
+from werkzeug.urls import url_encode
+
 from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
-
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
@@ -21,7 +24,12 @@ def get_app_url(path: str) -> str:
     rest = ""
 
     if request.query_string:
-        qs = request.query_string.decode()
+
+        """Parse and escape any query parameters"""
+        qs = []
+        for arg in request.args:
+            qs.append((arg, escape(request.args[arg])))
+        qs = url_encode(MultiDict(qs))
         rest = f"?{qs}"
 
     if "http://" in server_addr:
