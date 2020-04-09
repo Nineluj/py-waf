@@ -1,5 +1,4 @@
 from waf.modules.sqli import sql_injection_check
-from waf.modules.test import test
 
 """
 Templates = {
@@ -55,8 +54,7 @@ TEMPLATES = {
     "":
         {
             "": [
-                sql_injection_check,
-                test
+                sql_injection_check
             ]
         }
 }
