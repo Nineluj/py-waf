@@ -17,14 +17,41 @@ Any function can be added to the template, see test.py for the most basic form
 """
 
 TEMPLATES = {
-    "/www/SQL/sql1.php":
+    "www/SQL/sql1.php":
         {
             "firstname": [
                 sql_injection_check
             ]
         }
     ,
-
+    "www/SQL/sql2.php":
+        {
+            "number": [
+                # Intentionally insecure
+            ]
+        }
+    ,
+    "www/SQL/sql3.php":
+        {
+            "number": [
+                sql_injection_check
+            ]
+        }
+    ,
+    "www/SQL/sql4.php":
+        {
+            "number": [
+                sql_injection_check
+            ]
+        }
+    ,
+    "www/SQL/sql5.php":
+        {
+            "number": [
+                sql_injection_check
+            ]
+        }
+    ,
     "":
         {
             "": [

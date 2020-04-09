@@ -3,8 +3,7 @@ import requests
 from urllib.parse import urlparse
 from typing import List, Dict, Tuple
 from waf.form_parsing import Verifier
-from waf.form_template import FormTemplate, FormKey
-from waf.modules.sql_injection_check import sql_injection_check
+from waf.form_template import FormTemplate
 
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
@@ -47,6 +46,13 @@ def get_filtered_headers_client_response(resp: requests.Response) -> List[Tuple[
     return [(name, value) for (name, value) in headers.items()
             if name.lower() not in EXCLUDED_HEADERS]
 
+def run_verifier(verifier, form) -> None:
+    if not verifier.verify():
+        # Basic DEBUG information
+        for i in form:
+            app.logger.debug(f"Entry: [{form[i]}] ~|~ Key: {i}")
+        app.logger.debug("Failed verifier")
+        return make_400()
 
 # Simple function for proxying the request to the server
 @reverse_proxy.route('/', defaults={'path': ''})
@@ -77,13 +83,9 @@ def proxy(path):
         resp = requests.post(url=app_url, data=request.get_data(), headers=app_request_headers)
 
         # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
-        verf = Verifier(FormTemplate(app_url), request.form)
-        if not verf.verify():
-            # Basic DEBUG information
-            for i in request.form:
-                app.logger.debug(f"Entry: [{request.form[i]}] ~|~ Key: {i}")
-            app.logger.debug("Failed verifier")
-            return make_400()
+        verf = Verifier(FormTemplate(path), request.form)
+        run_verifier(verf, request.form)
+
         return resp.content, resp.status_code, get_filtered_headers_client_response(resp)
     else:
         # TODO: Implement other methods

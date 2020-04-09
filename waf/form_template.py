@@ -44,7 +44,6 @@ class FormKey:
             self.add_check(check)
 
     def run_checks(self, form_val):
-        print("CHECKS:\n\n\n\n\n\n", self.checks)
         for check in self.checks:
             if not check(form_val):
                 return False
