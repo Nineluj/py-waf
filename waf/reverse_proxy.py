@@ -2,9 +2,7 @@ from typing import List, Dict, Tuple
 from urllib.parse import urlparse
 
 import requests
-from flask import escape, request, Blueprint, current_app as app, redirect
-from werkzeug.datastructures import MultiDict
-from werkzeug.urls import url_encode
+from flask import request, Blueprint, current_app as app, redirect
 
 from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
@@ -25,7 +23,6 @@ def get_app_url(path: str) -> str:
     rest = ""
 
     if request.query_string:
-
         """Parse and escape any query parameters"""
         qs = XSSCheck(app)(request.args)
         rest = f"?{qs}"
@@ -52,6 +49,7 @@ def get_filtered_headers_client_response(resp: requests.Response) -> List[Tuple[
     return [(name, value) for (name, value) in headers.items()
             if name.lower() not in EXCLUDED_HEADERS]
 
+
 def run_verifier(verifier, form) -> None:
     if not verifier.verify():
         # Basic DEBUG information
@@ -59,6 +57,7 @@ def run_verifier(verifier, form) -> None:
             app.logger.debug(f"Entry: [{form[i]}] ~|~ Key: {i}")
         app.logger.debug("Failed verifier")
         return make_400()
+
 
 # Simple function for proxying the request to the server
 @reverse_proxy.route('/', defaults={'path': ''})
