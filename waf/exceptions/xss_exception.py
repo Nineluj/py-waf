@@ -1,0 +1,2 @@
+class XSSException(Exception):
+    pass
