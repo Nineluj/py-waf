@@ -5,7 +5,13 @@ use_ssl: Yes
 ssl_cert: 'config/cert.pem'
 ssl_key: 'config/key.pem'
 modules:
-  sqli: Yes
-  xss: Yes
-  security_headers: Yes
-  rate_limiter: Yes
+  sqli:
+    enabled: Yes
+  xss:
+    enabled: Yes
+    mode: 0  #{ 0=mitigate|1=block }
+  security_headers:
+    enabled: Yes
+  rate_limiter:
+    enabled: Yes
+    default_limits: '5000/day;500/hour'  #{'5000/day;500/hour;...'}

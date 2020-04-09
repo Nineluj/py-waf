@@ -1,3 +1,5 @@
+from enum import Enum
+
 from flask import escape
 from werkzeug.datastructures import MultiDict
 from werkzeug.urls import url_encode
@@ -7,10 +9,19 @@ XSS Checks
 """
 
 
+class Mode(Enum):
+    MITIGATE = 0
+    BLOCK = 1
+
+
 class XSSCheck(object):
     def __init__(self, app):
         self.app = app
-        self.enabled = app.config['modules'].pop('xss', True)
+        self.enabled = (app.config['modules'].get('xss', {'enabled': True})).get('enabled', True)
+        self.mode = Mode((app.config['modules'].get('xss', {'mode': 0})).get('mode', 0))
+        supported_modes = {Mode.MITIGATE, Mode.BLOCK}
+        if self.mode not in supported_modes:
+            self.mode = Mode.MITIGATE
 
     def __call__(self, query_string: MultiDict):
         if not self.enabled:

@@ -7,7 +7,7 @@ class SecurityHeaders(object):
 
     def __init__(self, app):
         self.app = app
-        self.enabled = app.config['modules'].pop('security_headers', True)
+        self.enabled = (app.config['modules'].get('security_headers', {'enabled': True})).get('enabled', True)
 
     def __call__(self):
         """Read this from config actually. This config is quite unsafe but it is here to make the vuln-app work."""
