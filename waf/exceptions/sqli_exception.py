@@ -1,0 +1,2 @@
+class SQLIException(Exception):
+    pass
