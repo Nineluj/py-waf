@@ -4,12 +4,13 @@ from urllib.parse import urlparse
 import requests
 from flask import request, Blueprint, current_app as app, redirect
 
+from waf.exceptions.xss_exception import XSSException
 from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
 from waf.modules.xss import XSSCheck
 
-from helper import make_error_page
-from html_inject import inject_warning
+from waf.helper import make_error_page
+from waf.html_inject import inject_warning
 
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
@@ -73,7 +74,10 @@ def proxy(path):
     if path == "throwerror":
         return make_error_page(500, "Intentionally throwing error", unexpected=True)
 
-    app_url = get_app_url(path)
+    try:
+        app_url = get_app_url(path)
+    except XSSException as ex:
+        return make_error_page(666, str(ex))
 
     if request.method == 'GET':
         app.logger.info(f"Retrieving URL: {app_url}")
