@@ -5,7 +5,7 @@ class RateLimiter(object):
     """Rate limiting"""
     def __init__(self, app):
         self.app = app
-        self.enabled = app.config['modules'].pop('rate_limiter', True)
+        self.enabled = app.config['modules'].get('rate_limiter', True)
 
     def __call__(self):
         if self.enabled:

@@ -10,7 +10,7 @@ XSS Checks
 class XSSCheck(object):
     def __init__(self, app):
         self.app = app
-        self.enabled = app.config['modules'].pop('xss', True)
+        self.enabled = app.config['modules'].get('xss', True)
 
     def __call__(self, query_string: MultiDict):
         if not self.enabled:
