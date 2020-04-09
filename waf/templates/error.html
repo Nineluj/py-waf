@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>PyWAF Content Block</title>
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class=page>
+<div class=main>
+  <div class=header>PyWAF
+    <span class=code>
+      &lt;{{ statuscode }}&gt;
+    </span>
+  </div>
+  <div class=content>
+    {{ reason }} More Information:
+
+    <div class=additional>
+      {{ additional }}
+    </div>
+  </div>
+  {% for message in get_flashed_messages() %}
+  <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>
+
+</body>
+</html>

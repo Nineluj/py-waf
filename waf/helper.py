@@ -1,4 +1,20 @@
 from yaml import safe_load
+from flask import render_template, render_template_string
+
+
+REASON_CONTENT_FILTER = "PyWAF has blocked this request because of it's content filter."
+REASON_UNEXPECTED = "PyWAF was not able to complete this request for an unexpected reason."
+
+
+def make_error_page(code: int, additional: str, unexpected=False):
+    """Returns a rendered template with error code to display error. unexpected should be set if the
+    error happened because of an error rather than an attempted attack"""
+    reason = REASON_UNEXPECTED if unexpected else REASON_CONTENT_FILTER
+
+    return render_template("/error.html",
+                           reason=reason,
+                           additional=additional,
+                           statuscode=code), code
 
 
 def parse_config(config_path: str, app) -> object:

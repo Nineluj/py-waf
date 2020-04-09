@@ -8,6 +8,8 @@ from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
 from waf.modules.xss_check import XSSCheck
 
+from helper import make_error_page
+
 EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
 reverse_proxy = Blueprint('reverse_proxy', __name__)
 
@@ -56,7 +58,7 @@ def run_verifier(verifier, form) -> None:
         for i in form:
             app.logger.debug(f"Entry: [{form[i]}] ~|~ Key: {i}")
         app.logger.debug("Failed verifier")
-        return make_400()
+        return make_error_page(401, "failed verification")
 
 
 # Simple function for proxying the request to the server
@@ -64,7 +66,11 @@ def run_verifier(verifier, form) -> None:
 @reverse_proxy.route('/<path:path>', methods=['GET', 'POST'])
 def proxy(path):
     if 'server_addr' not in app.config:
-        return make_400()
+        return make_error_page(500, "Server address hasn't been configured", unexpected=True)
+
+    # This is for demonstration purposed, don't remove
+    if path == "throwerror":
+        return make_error_page(500, "Intentionally throwing error", unexpected=True)
 
     app_url = get_app_url(path)
 
@@ -94,4 +100,4 @@ def proxy(path):
         return resp.content, resp.status_code, get_filtered_headers_client_response(resp)
     else:
         # TODO: Implement other methods
-        return make_400()
+        return make_error_page(500, f"Method ({request.method}) has not been implemented", unexpected=True)

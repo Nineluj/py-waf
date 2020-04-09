@@ -1,0 +1,39 @@
+.page {
+    background: cadetblue;
+    padding: 10px 10px;
+}
+
+.main {
+    padding: 20px;
+    width: 50%;
+    margin: auto;
+    color: dimgray;
+    background: whitesmoke;
+    height: 90vh;
+}
+
+.header {
+    /*background: red;*/
+    font-size: 56px;
+    margin-bottom: 10px;
+}
+
+.header > .code {
+    color: orangered;
+}
+
+.content {
+    height: 80%;
+    font-size: 22px;
+}
+
+.additional {
+    border: 1px black dotted;
+    padding: 20px;
+    border-radius: 15px;
+    background: white;
+    height: 95%;
+    margin-left: 15px;
+    margin-top: 30px;
+    color: midnightblue;
+}
