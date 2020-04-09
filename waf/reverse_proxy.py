@@ -6,7 +6,7 @@ from flask import request, Blueprint, current_app as app, redirect
 
 from waf.form_parsing import Verifier
 from waf.form_template import FormTemplate
-from waf.modules.xss_check import XSSCheck
+from waf.modules.xss import XSSCheck
 
 from helper import make_error_page
 

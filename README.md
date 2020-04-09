@@ -40,6 +40,10 @@ Running the flask app again should make the server run with HTTPS.
     ```
     docker run -it --name vuln_app -p 4040:4040 santosomar/vuln_app:latest /bin/bash
     ```
+   OR 
+   ```
+   docker run --rm -it -p 4040:80 vulnerables/web-dvwa
+   ```
 
 2. Run the WAF
     ```shell script

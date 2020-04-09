@@ -2,20 +2,14 @@ import logging
 
 import click
 from flask import Flask
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
+from waf.modules.rate_limiter import RateLimiter
 from waf.modules.security_headers import SecurityHeaders
 from .helper import parse_config
 from .reverse_proxy import reverse_proxy
 
 app = Flask(__name__)
 
-limiter = Limiter(
-    app,
-    key_func=get_remote_address,
-    default_limits=["5000/day", "500/hour"]
-)
 USAGE = "Run with --help for options"
 app.register_blueprint(reverse_proxy)
 
@@ -42,6 +36,8 @@ def main(config_path) -> None:
         key = app.config['ssl_key']
         security_context = (cert, key)
 
+    """Run the general modules"""
     SecurityHeaders(app)()
+    RateLimiter(app)()
 
     app.run(host='0.0.0.0', port=app.config['port'], debug=app.config['debug'], ssl_context=security_context)
