@@ -1,8 +1,9 @@
 import re
 
 INVALID_INPUT = [
-    "--", "\'", "\"", "\*", "=", " /", ";",
-    "DROP ", "SELECT "
+    "--", "\'", "\"", "\*", "=", r"/", "\\\\", ";", "`", "^,"
+    "DROP ", "SELECT ", r"AND .", r"ORDER BY .*",
+    r"[0-9]-(true|false)", r"%[0-9][0-9]", r"(sleep|SLEEP)\(.*\)", r"benchmark\(.*\)", r"@@variable"
 ]
 
 
