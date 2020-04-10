@@ -1,17 +1,21 @@
 .pywaf-warning {
-    height: 50px;
+    width: 100vw;
+    position:fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
 }
 
 .pywaf-warning-banner {
     background:cadetblue;
     color:orangered;
-    font-size:40px;
-    padding:15px;
-    position: absolute;
-    width: 100vw;
-    top: 0;
-    left: 0;
-    height:20px;
+    font-size:18px;
+    padding:10px;
+    /*position: absolute;*/
+    /*width: 100vw;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    /*height:20px;*/
 }
 
 .pywaf-warning-header {

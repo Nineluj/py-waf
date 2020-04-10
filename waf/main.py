@@ -8,6 +8,7 @@ from waf.modules.security_headers import SecurityHeaders
 from .helper import parse_config
 from .reverse_proxy import reverse_proxy
 
+# Static directory can be changed here to avoid collisions with underlying app's static directory
 app = Flask(__name__)
 
 USAGE = "Run with --help for options"

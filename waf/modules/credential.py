@@ -94,7 +94,7 @@ class HaveIBeenPwnedApi:
         for line in (resp.content.decode().split("\r\n")):
             parts = line.split(":")
             if parts[0].lower() == pass_hex_body:
-                return parts[1]
+                return int(parts[1])
 
         return 0
 
