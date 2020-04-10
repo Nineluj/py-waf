@@ -30,7 +30,6 @@ def get_app_url(path: str) -> str:
 
     if request.query_string:
         """Parse and escape any query parameters"""
-        print("Request args:", request.args)
         qs = XSSCheck(app)(request.args, RequestType.GET)
         qs = SQLCheck(app)(qs, RequestType.GET)
         rest = f"?{qs}"
