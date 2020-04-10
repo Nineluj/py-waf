@@ -20,6 +20,7 @@ class CredentialCheck(object):
         if self.password_strength.value < PasswordStrength.VERY_GUESSABLE.value or self.password_strength.value > PasswordStrength.VERY_UNGUESSABLE.value:
             self.password_strength = PasswordStrength.VERY_UNGUESSABLE
         self.password_check_api = 'https://api.pwnedpasswords.com/range/{}'
+        self.email_check_api = 'https://digibody.avast.com/v1/web/leaks'
 
     def __call__(self, uri, data):
         """Return True if this is matching a filtered_url"""
@@ -47,6 +48,12 @@ class CredentialCheck(object):
 
     def __email_check(self, email):
         """Hit the have I been pwned api for emails"""
+        res = requests.post(self.email_check_api, json={'email': email})
+        if res.status_code != HTTPStatus.OK:
+            raise CredentialException("Email check API is misbehaving")
+        values = res.json().get('value', [])
+        if values:
+            raise CredentialException(f"Email found in {len(values)} breaches")
         pass
 
     def __password_check(self, password, data):
