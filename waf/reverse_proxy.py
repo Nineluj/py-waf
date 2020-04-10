@@ -111,12 +111,6 @@ def handle_get(app_url, timeout):
 
     content = resp.content
 
-    if isinstance(content, (bytes, bytearray)) \
-            and "Content-Type" in resp.headers \
-            and "text/html" in resp.headers['Content-Type']:
-        content = inject_warning(content)
-        # content
-
     # Flask routes can accept tuple (content, status, headers)
     return content, resp.status_code, headers
 
@@ -129,6 +123,11 @@ def handle_post(app_url, timeout):
     try:
         is_credential_page = CredentialCheck(app)(request.path, request.form)
     except CredentialException as ex:
+        # TODO may want to issue a warning instead
+        if isinstance(data, (bytes, bytearray)) \
+                and "Content-Type" in app_request_headers \
+                and "text/html" in app_request_headers['Content-Type']:
+            content = inject_warning(data)
         return make_error_page(403, str(ex))
 
     if not is_credential_page:
