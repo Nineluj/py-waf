@@ -1,8 +1,10 @@
 import requests
 from hashlib import sha1
+from zxcvbn import zxcvbn
 
 from waf.custom_types.credential_type import CredentialType
 from waf.custom_types.password_strength import PasswordStrength
+from waf.exceptions.credential_exception import CredentialException
 
 
 class Credential(object):
@@ -13,6 +15,8 @@ class Credential(object):
         self.password_strength = (
             app.config['modules'].get('xss', {'password_strength': PasswordStrength.VERY_UNGUESSABLE})).get(
             'password_strength', PasswordStrength.VERY_UNGUESSABLE)
+        if self.password_strength < PasswordStrength.VERY_GUESSABLE or self.password_strength > PasswordStrength.VERY_UNGUESSABLE:
+            self.password_strength = PasswordStrength.VERY_UNGUESSABLE
 
     def __call__(self, uri, data):
         if not self.enabled:
@@ -39,16 +43,32 @@ class Credential(object):
         """Hit the have I been pwned api for emails"""
         pass
 
-    def __password_check(self, password):
+    def __password_check(self, password, data):
         """Check for strength and if the password has been pwned"""
-        pass
+        self.__is_password_pwned(password)
+        self.__is_password_unguessable(password)
 
-    def __is_password_pwned(self, password, data):
+    def __is_password_pwned(self, password):
         """Has this password been pwned?"""
-        pass
+        n_usages = HaveIBeenPwnedApi.password_originality(password)
+
+        if n_usages == -1:
+            raise CredentialException("Unable to reach HIBP API")
+        elif n_usages > 500:
+            raise CredentialException("Common password")
+        elif n_usages > 10000:
+            raise CredentialException("Very common password")
+
+        """Do nothing"""
 
     def __is_password_unguessable(self, password, data):
-        pass
+        """Is this password easily guessable?"""
+        result = zxcvbn(password, user_inputs=data)
+        if result['score'] < self.password_strength:
+            raise CredentialException(result['feedback'])
+        else:
+            """Do nothing"""
+            pass
 
 
 class HaveIBeenPwnedApi:
@@ -77,3 +97,4 @@ class HaveIBeenPwnedApi:
                 return parts[1]
 
         return 0
+

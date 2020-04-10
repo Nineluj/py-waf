@@ -5,3 +5,4 @@ Flask-Limiter==1.2.1
 PyYAML==5.3.1
 Werkzeug==1.0.1
 flask-talisman==0.7.0
+zxcvbn==4.4.28
