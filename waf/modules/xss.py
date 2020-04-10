@@ -15,7 +15,7 @@ class XSSCheck(object):
     def __init__(self, app):
         self.app = app
         self.enabled = (app.config['modules'].get('xss', {'enabled': True})).get('enabled', True)
-        self.mode = Mode((app.config['modules'].get('xss', {'mode': 0})).get('mode', 0))
+        self.mode = Mode((app.config['modules'].get('xss', {'mode': Mode.MITIGATE})).get('mode', Mode.MITIGATE))
         supported_modes = {Mode.MITIGATE, Mode.BLOCK}
         if self.mode not in supported_modes:
             self.mode = Mode.MITIGATE
