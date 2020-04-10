@@ -1,4 +1,4 @@
-.pywaf-warning {
+#pywaf-warning {
     width: 100vw;
     position:fixed;
     top: 0;
@@ -20,4 +20,15 @@
 
 .pywaf-warning-header {
     color: whitesmoke;
+}
+
+.pywaf-warning-dismiss {
+    color: orangered;
+    position: absolute;
+    right: 25px;
+    cursor: pointer;
+}
+
+.pywaf-hidden {
+    display: none;
 }

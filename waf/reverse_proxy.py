@@ -96,6 +96,8 @@ def handle_get(app_url, timeout):
                             timeout=timeout)
     except requests.exceptions.Timeout:
         return make_error_page(504, "Connection to application timed out", unexpected=True)
+    except requests.exceptions.ConnectionError:
+        return make_error_page(504, "Unable to connect to the application server", unexpected=True)
 
     headers = get_filtered_headers_client_response(resp)
 
@@ -150,6 +152,8 @@ def handle_post(app_url, timeout):
                              timeout=timeout)
     except requests.exceptions.Timeout:
         return make_error_page(504, "Connection to application timed out", unexpected=True)
+    except requests.exceptions.ConnectionError:
+        return make_error_page(504, "Unable to connect to the application server", unexpected=True)
 
     if resp.is_redirect:
         o = urlparse(resp.raw.headers['Location'])
