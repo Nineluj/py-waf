@@ -16,11 +16,6 @@ EXCLUDED_HEADERS = ['content-encoding', 'content-length', 'transfer-encoding', '
 reverse_proxy = Blueprint('reverse_proxy', __name__)
 
 
-def make_400():
-    """Return a generic 404 error that flask can understand"""
-    return "Record not found", 400
-
-
 def get_app_url(path: str) -> str:
     """Resolve requested path into the address on the application server"""
     server_addr = app.config['server_addr']
@@ -137,6 +132,14 @@ def handle_post(app_url, timeout):
     resp = requests.post(url=app_url,
                          data=data,
                          headers=app_request_headers,
+                         allow_redirects=False,
                          timeout=timeout)
+
+    if resp.is_redirect:
+        o = urlparse(resp.raw.headers['Location'])
+        # We need to append "?" before query param
+        new_resource_path = f"{o.path}?{o.query}" if o.query else o.path
+
+        return redirect(new_resource_path, code=resp.status_code)
 
     return resp.content, resp.status_code, get_filtered_headers_client_response(resp)
