@@ -34,7 +34,6 @@ class CredentialCheck(object):
                 fields = self.filtered_urls[uri]
                 for arg in data:
                     if arg in fields:
-                        print(fields[arg], fields[arg] == CredentialType.EMAIL, fields[arg] == CredentialType.PASSWORD)
                         if CredentialType(fields[arg]) == CredentialType.EMAIL:
                             """Do something with the result here"""
                             self.__email_check(data[arg])
