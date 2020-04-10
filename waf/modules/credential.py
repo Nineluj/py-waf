@@ -1,5 +1,8 @@
+from zxcvbn import zxcvbn
+
 from waf.custom_types.credential_type import CredentialType
 from waf.custom_types.password_strength import PasswordStrength
+from waf.exceptions.credential_exception import CredentialException
 
 
 class Credential(object):
@@ -10,6 +13,8 @@ class Credential(object):
         self.password_strength = (
             app.config['modules'].get('xss', {'password_strength': PasswordStrength.VERY_UNGUESSABLE})).get(
             'password_strength', PasswordStrength.VERY_UNGUESSABLE)
+        if self.password_strength < PasswordStrength.VERY_GUESSABLE or self.password_strength > PasswordStrength.VERY_UNGUESSABLE:
+            self.password_strength = PasswordStrength.VERY_UNGUESSABLE
 
     def __call__(self, uri, data):
         if not self.enabled:
@@ -36,13 +41,18 @@ class Credential(object):
         """Hit the have I been pwned api for emails"""
         pass
 
-    def __password_check(self, password):
+    def __password_check(self, password, data):
         """Check for strength and if the password has been pwned"""
         pass
 
-    def __is_password_pwned(self, password, data):
+    def __is_password_pwned(self, password):
         """Has this password been pwned?"""
         pass
 
     def __is_password_unguessable(self, password, data):
-        pass
+        result = zxcvbn(password, user_inputs = data)
+        if result['score'] < self.password_strength:
+            raise CredentialException(result['feedback'])
+        else:
+            """Do nothing"""
+            pass
