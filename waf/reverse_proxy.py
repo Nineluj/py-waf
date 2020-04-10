@@ -4,8 +4,10 @@ from urllib.parse import urlparse
 import requests
 from flask import request, Blueprint, current_app as app, redirect
 
+from waf.exceptions.credential_exception import CredentialException
 from waf.exceptions.xss_exception import XSSException
 from waf.exceptions.sqli_exception import SQLIException
+from waf.modules.credential import CredentialCheck
 from waf.modules.xss import XSSCheck, RequestType
 from waf.modules.sqli import SQLCheck
 
@@ -119,26 +121,33 @@ def handle_get(app_url, timeout):
 
 def handle_post(app_url, timeout):
     app_request_headers = filter_headers_app_request(dict(request.headers))
+    data = request.form
 
     # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
     try:
-        SQLCheck(app)(request.form)
-    except SQLIException:
-        return make_error_page(403, "Failed SQL form verification")
+        is_credential_page = CredentialCheck(app)(request.path, request.form)
+    except CredentialException as ex:
+        return make_error_page(403, str(ex))
 
-    try:
-        """Check for xss in fields"""
-        data = XSSCheck(app)(request.form, RequestType.POST)
-    except XSSException as ex:
-        return make_error_page(666, str(ex))
+    if not is_credential_page:
+        try:
+            SQLCheck(app)(request.form)
+        except SQLIException:
+            return make_error_page(403, "Failed SQL form verification")
+
+        try:
+            """Check for xss in fields"""
+            data = XSSCheck(app)(request.form, RequestType.POST)
+        except XSSException as ex:
+            return make_error_page(666, str(ex))
 
     app.logger.info(f"Making POST: {app_url}")
     try:
         resp = requests.post(url=app_url,
-                         data=data,
-                         headers=app_request_headers,
-                         allow_redirects=False,
-                         timeout=timeout)
+                             data=data,
+                             headers=app_request_headers,
+                             allow_redirects=False,
+                             timeout=timeout)
     except requests.exceptions.Timeout:
         return make_error_page(504, "Connection to application timed out", unexpected=True)
 

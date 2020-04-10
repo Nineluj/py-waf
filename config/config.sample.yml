@@ -8,12 +8,24 @@ timeout: 5  #{timeout in seconds}
 modules:
   sqli:
     enabled: Yes
-    mode: 1  #{ 1=block }
+    mode: 1  #{1=block}
   xss:
     enabled: Yes
-    mode: 0  #{ 0=mitigate|1=block }
+    mode: 0  #{0=mitigate|1=block}
   security_headers:
     enabled: Yes
   rate_limiter:
     enabled: Yes
     default_limits: '5000/day;500/hour'  #{'5000/day;500/hour;...'}
+  credential:
+    enabled: Yes
+    password_strength: 3 #{0=TOO_GUESSABLE|1=VERY_GUESSABLE|2=SOMEWHAT_GUESSABLE|3=SAFELY_UNGUESSABLE|4=VERY_UNGUESSABLE}
+    filtered_urls:
+      '/api/signup':
+        'username': 0 #{0=email|1=password}
+        'password': 1
+      '/api/v3/password-reset':
+        'new_password': 1
+      '/vulnerabilities/xss_s/':
+        'mtxMessage': 1
+        'txtName': 0
