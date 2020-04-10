@@ -87,10 +87,14 @@ def handle_get(app_url, timeout):
     app_request_headers = filter_headers_app_request(dict(request.headers))
     app.logger.info(f"Retrieving URL: {app_url}")
 
-    resp = requests.get(url=app_url,
-                        allow_redirects=False,
-                        headers=app_request_headers,
-                        timeout=timeout)
+    try:
+        resp = requests.get(url=app_url,
+                            allow_redirects=False,
+                            headers=app_request_headers,
+                            timeout=timeout)
+    except requests.exceptions.Timeout:
+        return make_error_page(504, "Connection to application timed out", unexpected=True)
+
     headers = get_filtered_headers_client_response(resp)
 
     # We need to handle redirects correctly
@@ -129,11 +133,14 @@ def handle_post(app_url, timeout):
         return make_error_page(666, str(ex))
 
     app.logger.info(f"Making POST: {app_url}")
-    resp = requests.post(url=app_url,
+    try:
+        resp = requests.post(url=app_url,
                          data=data,
                          headers=app_request_headers,
                          allow_redirects=False,
                          timeout=timeout)
+    except requests.exceptions.Timeout:
+        return make_error_page(504, "Connection to application timed out", unexpected=True)
 
     if resp.is_redirect:
         o = urlparse(resp.raw.headers['Location'])
