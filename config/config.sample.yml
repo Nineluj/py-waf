@@ -8,6 +8,7 @@ timeout: 5  #{timeout in seconds}
 modules:
   sqli:
     enabled: Yes
+    mode: 1  #{ 1=block }
   xss:
     enabled: Yes
     mode: 0  #{ 0=mitigate|1=block }
