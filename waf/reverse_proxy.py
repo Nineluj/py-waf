@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 
 import requests
 from flask import request, Blueprint, current_app as app, redirect
+from werkzeug.datastructures import MultiDict
+from werkzeug.urls import url_encode
 
 from waf.exceptions.xss_exception import XSSException
 from waf.exceptions.sqli_exception import SQLIException
@@ -28,7 +30,9 @@ def get_app_url(path: str) -> str:
 
     if request.query_string:
         """Parse and escape any query parameters"""
+        print("Request args:", request.args)
         qs = XSSCheck(app)(request.args)
+        qs = SQLCheck(app)(qs, 'GET')
         rest = f"?{qs}"
 
     if "http://" in server_addr:
@@ -68,6 +72,8 @@ def proxy(path):
         app_url = get_app_url(path)
     except XSSException as ex:
         return make_error_page(666, str(ex))
+    except SQLIException:
+        return make_error_page(403, "Failed SQL form verification")
 
     if 'timeout' in app.config:
         timeout = app.config['timeout']
@@ -106,7 +112,7 @@ def proxy(path):
 
         # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
         try:
-            SQLCheck(app)(request.form)
+            SQLCheck(app)(request.form, 'POST')
         except SQLIException:
             return make_error_page(403, "Failed SQL form verification")
 
