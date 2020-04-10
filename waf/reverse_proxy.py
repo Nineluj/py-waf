@@ -76,10 +76,12 @@ def proxy(path):
         timeout = 5
 
     if request.method == 'GET':
+        app_request_headers = filter_headers_app_request(dict(request.headers))
         app.logger.info(f"Retrieving URL: {app_url}")
         # TODO: add headers here like for POST?
         resp = requests.get(url=app_url,
                             allow_redirects=False,
+                            headers=app_request_headers,
                             timeout=timeout)
         headers = get_filtered_headers_client_response(resp)
 
@@ -103,7 +105,6 @@ def proxy(path):
         return content, resp.status_code, headers
     elif request.method == "POST":
         app_request_headers = filter_headers_app_request(dict(request.headers))
-        data = request.get_data()
 
         # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
         try:

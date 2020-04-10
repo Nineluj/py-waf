@@ -3,8 +3,8 @@ from werkzeug.datastructures import MultiDict
 from werkzeug.urls import url_encode
 
 from waf.exceptions.xss_exception import XSSException
-from waf.types.module_mode import Mode
-from waf.types.request_type import RequestType
+from waf.custom_types.module_mode import Mode
+from waf.custom_types.request_type import RequestType
 
 """
 XSS Checks
