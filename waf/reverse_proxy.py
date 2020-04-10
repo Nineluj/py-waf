@@ -70,60 +70,73 @@ def proxy(path):
     except XSSException as ex:
         return make_error_page(666, str(ex))
 
-    if 'timeout' in app.config:
-        timeout = app.config['timeout']
-    else:
-        timeout = 5
+    timeout = get_timeout()
 
     if request.method == 'GET':
-        app_request_headers = filter_headers_app_request(dict(request.headers))
-        app.logger.info(f"Retrieving URL: {app_url}")
-        # TODO: add headers here like for POST?
-        resp = requests.get(url=app_url,
-                            allow_redirects=False,
-                            headers=app_request_headers,
-                            timeout=timeout)
-        headers = get_filtered_headers_client_response(resp)
-
-        # We need to handle redirects correctly
-        if resp.is_redirect:
-            o = urlparse(resp.raw.headers['Location'])
-            # We need to append "?" before query param
-            new_resource_path = f"{o.path}?{o.query}" if o.query else o.path
-
-            return redirect(new_resource_path, code=resp.status_code)
-
-        content = resp.content
-
-        if isinstance(content, (bytes, bytearray)) \
-                and "Content-Type" in resp.headers \
-                and "text/html" in resp.headers['Content-Type']:
-            content = inject_warning(content)
-            # content
-
-        # Flask routes can accept tuple (content, status, headers)
-        return content, resp.status_code, headers
+        return handle_get(app_url, timeout)
     elif request.method == "POST":
-        app_request_headers = filter_headers_app_request(dict(request.headers))
-
-        # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
-        try:
-            SQLCheck(app)(request.form)
-        except SQLIException:
-            return make_error_page(403, "Failed SQL form verification")
-
-        try:
-            """Check for xss in fields"""
-            data = XSSCheck(app)(request.form, RequestType.POST)
-        except XSSException as ex:
-            return make_error_page(666, str(ex))
-
-        resp = requests.post(url=app_url,
-                             data=data,
-                             headers=app_request_headers,
-                             timeout=timeout)
-
-        return resp.content, resp.status_code, get_filtered_headers_client_response(resp)
+        return handle_post(app_url, timeout)
     else:
         # TODO: Implement other methods
         return make_error_page(500, f"Method ({request.method}) has not been implemented", unexpected=True)
+
+
+def get_timeout() -> int:
+    if 'timeout' in app.config:
+        return app.config['timeout']
+    else:
+        return 5
+
+
+def handle_get(app_url, timeout):
+    app_request_headers = filter_headers_app_request(dict(request.headers))
+    app.logger.info(f"Retrieving URL: {app_url}")
+
+    resp = requests.get(url=app_url,
+                        allow_redirects=False,
+                        headers=app_request_headers,
+                        timeout=timeout)
+    headers = get_filtered_headers_client_response(resp)
+
+    # We need to handle redirects correctly
+    if resp.is_redirect:
+        o = urlparse(resp.raw.headers['Location'])
+        # We need to append "?" before query param
+        new_resource_path = f"{o.path}?{o.query}" if o.query else o.path
+
+        return redirect(new_resource_path, code=resp.status_code)
+
+    content = resp.content
+
+    if isinstance(content, (bytes, bytearray)) \
+            and "Content-Type" in resp.headers \
+            and "text/html" in resp.headers['Content-Type']:
+        content = inject_warning(content)
+        # content
+
+    # Flask routes can accept tuple (content, status, headers)
+    return content, resp.status_code, headers
+
+
+def handle_post(app_url, timeout):
+    app_request_headers = filter_headers_app_request(dict(request.headers))
+
+    # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
+    try:
+        SQLCheck(app)(request.form)
+    except SQLIException:
+        return make_error_page(403, "Failed SQL form verification")
+
+    try:
+        """Check for xss in fields"""
+        data = XSSCheck(app)(request.form, RequestType.POST)
+    except XSSException as ex:
+        return make_error_page(666, str(ex))
+
+    app.logger.info(f"Making POST: {app_url}")
+    resp = requests.post(url=app_url,
+                         data=data,
+                         headers=app_request_headers,
+                         timeout=timeout)
+
+    return resp.content, resp.status_code, get_filtered_headers_client_response(resp)
