@@ -6,9 +6,8 @@ from flask import request, Blueprint, current_app as app, redirect
 
 from waf.exceptions.xss_exception import XSSException
 from waf.exceptions.sqli_exception import SQLIException
-from waf.form_parsing import Verifier
-from waf.form_template import FormTemplate
 from waf.modules.xss import XSSCheck
+from waf.modules.sqli import SQLCheck
 
 from waf.helper import make_error_page
 from waf.html_inject import inject_warning
@@ -53,16 +52,6 @@ def get_filtered_headers_client_response(resp: requests.Response) -> List[Tuple[
     headers = resp.raw.headers
     return [(name, value) for (name, value) in headers.items()
             if name.lower() not in EXCLUDED_HEADERS]
-
-
-def run_verifier(verifier, form) -> None:
-    if not verifier.verify():
-        # Basic DEBUG information
-        for i in form:
-            app.logger.debug(f"Entry: [{form[i]}] ~|~ Key: {i}")
-        app.logger.debug("Failed verifier")
-        raise SQLIException()
-
 
 # Simple function for proxying the request to the server
 @reverse_proxy.route('/', defaults={'path': ''})
@@ -117,10 +106,9 @@ def proxy(path):
 
         # Need to check form AFTER the request.get_data() call, or else the form will be missing from that data
         try:
-            verf = Verifier(FormTemplate(path), request.form)
-            run_verifier(verf, request.form)
+            SQLCheck(app)(request.form)
         except SQLIException:
-            return make_error_page(403, "failed SQL form verification")
+            return make_error_page(403, "Failed SQL form verification")
 
         resp = requests.post(url=app_url,
                              data=data,
