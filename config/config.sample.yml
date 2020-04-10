@@ -26,3 +26,6 @@ modules:
         'password': 1
       '/api/v3/password-reset':
         'new_password': 1
+      '/vulnerabilities/xss_s/':
+        'mtxMessage': 1
+        'txtName': 0
