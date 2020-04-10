@@ -1,5 +1,5 @@
 server_addr: '172.17.0.1:9991'
-port: 9001
+port: 9000
 debug: Yes
 use_ssl: Yes
 ssl_cert: 'config/cert.pem'
@@ -11,7 +11,7 @@ modules:
     mode: 1  #{ 1=block }
   xss:
     enabled: Yes
-    mode: 1  #{ 0=mitigate|1=block }
+    mode: 0  #{ 0=mitigate|1=block }
   security_headers:
     enabled: Yes
   rate_limiter:
