@@ -6,6 +6,7 @@ from werkzeug.urls import url_decode, url_encode
 from waf.modules.xss import Mode
 from waf.exceptions.sqli_exception import SQLIException
 from waf.types.module_mode import Mode
+from waf.types.request_type import RequestType
 
 INVALID_INPUT = [
     "--", "[^a-z,A-Z,0-9]\'[^a-z,A-Z,0-9]", "\"", r" \* ", "=", r"/",
@@ -24,19 +25,18 @@ class SQLCheck(object):
         if self.mode not in supported_modes:
             self.mode = Mode.BLOCK
 
-    def __call__(self, content, method):
-        if method == 'POST':
+    def __call__(self, content, request_type=RequestType.DEFAULT):
+        if request_type == 2:
             if self.enabled:
                 for key in content:
                     if not sql_injection_check(content[key], []):
                         raise SQLIException
-        elif method == 'GET':
+        elif request_type == 1:
             if not content:
                 return content
             arguments = []
             if self.enabled:
                 decoded = url_decode(content)
-                print("DICTIONARY INPUT:", decoded)
                 for key in decoded:
                     if not sql_injection_check(decoded[key], []):
                         if self.mode == Mode.BLOCK:
