@@ -1,3 +1,6 @@
+import requests
+from hashlib import sha1
+
 from waf.custom_types.credential_type import CredentialType
 from waf.custom_types.password_strength import PasswordStrength
 
@@ -46,3 +49,31 @@ class Credential(object):
 
     def __is_password_unguessable(self, password, data):
         pass
+
+
+class HaveIBeenPwnedApi:
+    ENDPOINT = "https://api.pwnedpasswords.com/range/"
+
+    @staticmethod
+    def password_originality(password) -> int:
+        """Finds the numbers of times a password has been found in a password
+        leak with the HIBP API"""
+        pass_hash = sha1()
+        pass_hash.update(password.encode())
+        pass_hex = pass_hash.hexdigest()
+
+        pass_hex_prefix = pass_hex[:5]
+        pass_hex_body = pass_hex[5:]
+
+        # Gives us back a list of hashes whose start match the pass_hex_prefix
+        resp = requests.get(f"https://api.pwnedpasswords.com/range/{pass_hex_prefix}")
+
+        if resp.status_code != 200:
+            return -1
+
+        for line in (resp.content.decode().split("\r\n")):
+            parts = line.split(":")
+            if parts[0].lower() == pass_hex_body:
+                return parts[1]
+
+        return 0
