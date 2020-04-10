@@ -5,6 +5,7 @@ from werkzeug.urls import url_decode, url_encode
 
 from waf.modules.xss import Mode
 from waf.exceptions.sqli_exception import SQLIException
+from waf.types.module_mode import Mode
 
 INVALID_INPUT = [
     "--", "[^a-z,A-Z,0-9]\'[^a-z,A-Z,0-9]", "\"", r" \* ", "=", r"/",

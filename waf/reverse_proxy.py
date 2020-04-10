@@ -8,7 +8,7 @@ from werkzeug.urls import url_encode
 
 from waf.exceptions.xss_exception import XSSException
 from waf.exceptions.sqli_exception import SQLIException
-from waf.modules.xss import XSSCheck
+from waf.modules.xss import XSSCheck, RequestType
 from waf.modules.sqli import SQLCheck
 
 from waf.helper import make_error_page
@@ -33,6 +33,7 @@ def get_app_url(path: str) -> str:
         print("Request args:", request.args)
         qs = XSSCheck(app)(request.args)
         qs = SQLCheck(app)(qs, 'GET')
+        qs = XSSCheck(app)(request.args, RequestType.GET)
         rest = f"?{qs}"
 
     if "http://" in server_addr:
@@ -56,6 +57,7 @@ def get_filtered_headers_client_response(resp: requests.Response) -> List[Tuple[
     headers = resp.raw.headers
     return [(name, value) for (name, value) in headers.items()
             if name.lower() not in EXCLUDED_HEADERS]
+
 
 # Simple function for proxying the request to the server
 @reverse_proxy.route('/', defaults={'path': ''})
@@ -115,6 +117,12 @@ def proxy(path):
             SQLCheck(app)(request.form, 'POST')
         except SQLIException:
             return make_error_page(403, "Failed SQL form verification")
+
+        try:
+            """Check for xss in fields"""
+            data = XSSCheck(app)(request.form, RequestType.POST)
+        except XSSException as ex:
+            return make_error_page(666, str(ex))
 
         resp = requests.post(url=app_url,
                              data=data,
