@@ -1,0 +1,33 @@
+
+	XSStrike v3.1.4
+
+ WAF Status: Offline 
+ Fuzzing parameter: username 
+ [filtered] <test 
+ [filtered] <test// 
+ [filtered] <test> 
+ [filtered] <test x> 
+ [filtered] <test x=y 
+ [filtered] <test x=y// 
+ [filtered] <test/oNxX=yYy// 
+ [filtered] <test oNxX=yYy> 
+ [filtered] <test onload=x 
+ [filtered] <test/o%00nload=x 
+ [filtered] <test sRc=xxx 
+ [filtered] <test data=asa 
+ [filtered] <test data=javascript:asa 
+ [filtered] <svg x=y> 
+ [filtered] <details x=y// 
+ [filtered] <a href=x// 
+ [filtered] <emBed x=y> 
+ [filtered] <object x=y// 
+ [filtered] <bGsOund sRc=x> 
+ [filtered] <iSinDEx x=y// 
+ [filtered] <aUdio x=y> 
+ [filtered] <script x=y> 
+ [filtered] <script//src=// 
+ [filtered] ">payload<br/attr=" 
+ [filtered] "-confirm``-" 
+ [filtered] <test ONdBlcLicK=x> 
+ [filtered] <test/oNcoNTeXtMenU=x> 
+ [filtered] <test OndRAgOvEr=x> 
