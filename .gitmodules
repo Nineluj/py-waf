@@ -1,3 +1,3 @@
-[submodule "experiment_tests/xss/XSStrike"]
-	path = experiment_tests/xss/XSStrike
+[submodule "artifacts/experiment_tests/xss/XSStrike"]
+	path = artifacts/experiment_tests/xss/XSStrike
 	url = git@github.com:s0md3v/XSStrike.git
