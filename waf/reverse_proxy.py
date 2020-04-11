@@ -53,7 +53,7 @@ def get_filtered_headers_client_response(resp: requests.Response) -> List[Tuple[
 
 # Simple function for proxying the request to the server
 @reverse_proxy.route('/', defaults={'path': ''})
-@reverse_proxy.route('/<path:path>', methods=['GET', 'POST'])
+@reverse_proxy.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'HEAD'])
 def proxy(path):
     if 'server_addr' not in app.config:
         return make_error_page(500, "Server address hasn't been configured", unexpected=True)
@@ -73,8 +73,13 @@ def proxy(path):
         return handle_get(app_url, timeout)
     elif request.method == "POST":
         return handle_post(app_url, timeout)
+    elif request.method == "PUT":
+        return handle_put(app_url, timeout)
+    elif request.method == "DELETE":
+        return handle_delete(app_url, timeout)
+    elif request.method == 'HEAD':
+        return handle_head(app_url, timeout)
     else:
-        # TODO: Implement other methods
         return make_error_page(500, f"Method ({request.method}) has not been implemented", unexpected=True)
 
 
@@ -86,14 +91,28 @@ def get_timeout() -> int:
 
 
 def handle_get(app_url, timeout):
+    return handle_get_delete(requests.get, app_url, timeout)
+
+
+def handle_delete(app_url, timeout):
+    return handle_get_delete(requests.delete, app_url, timeout)
+
+
+def handle_head(app_url, timeout):
+    # We drop the content for the head
+    _, status_code, headers = handle_get_delete(requests.head, app_url, timeout)
+    return None, status_code, headers
+
+
+def handle_get_delete(req_fn, app_url, timeout):
     app_request_headers = filter_headers_app_request(dict(request.headers))
     app.logger.info(f"Retrieving URL: {app_url}")
 
     try:
-        resp = requests.get(url=app_url,
-                            allow_redirects=False,
-                            headers=app_request_headers,
-                            timeout=timeout)
+        resp = req_fn(url=app_url,
+                      allow_redirects=False,
+                      headers=app_request_headers,
+                      timeout=timeout)
     except requests.exceptions.Timeout:
         return make_error_page(504, "Connection to application timed out", unexpected=True)
     except requests.exceptions.ConnectionError:
@@ -116,6 +135,14 @@ def handle_get(app_url, timeout):
 
 
 def handle_post(app_url, timeout):
+    return handle_post_put(requests.post, app_url, timeout)
+
+
+def handle_put(app_url, timeout):
+    return handle_post_put(requests.put, app_url, timeout)
+
+
+def handle_post_put(req_fn, app_url, timeout):
     app_request_headers = filter_headers_app_request(dict(request.headers))
     data = request.form
 
@@ -144,11 +171,11 @@ def handle_post(app_url, timeout):
 
     app.logger.info(f"Making POST: {app_url}")
     try:
-        resp = requests.post(url=app_url,
-                             data=data,
-                             headers=app_request_headers,
-                             allow_redirects=False,
-                             timeout=timeout)
+        resp = req_fn(url=app_url,
+                      data=data,
+                      headers=app_request_headers,
+                      allow_redirects=False,
+                      timeout=timeout)
     except requests.exceptions.Timeout:
         return make_error_page(504, "Connection to application timed out", unexpected=True)
     except requests.exceptions.ConnectionError:
