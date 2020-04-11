@@ -1,5 +1,35 @@
 # py-waf - A python WAF
 
+## Features
+* Detects and prevents Reflected and Stored XSS attacks by dropping requests or escaping dangerous characters
+* Detects and prevents SQL injections by matching form input in vulnerable forms to SQL commands and escape characters
+* Prevents DoS for the web server by rate limiting
+* Supports TLS with HTTPS for requests
+* Adds security headers requests
+* Checks for breached emails/passwords
+
+## Screenshots
+Blocked XSS
+
+![xss_detect](screenshots/xss_detect.png)
+
+Detecting password found in a breach (using HaveIBeenPwned API)
+
+![password_check](screenshots/breached_password.png)
+
+Detecting email address found in breach
+
+![email_check](screenshots/email_check.png)
+
+See the [PDF](Web%20Application%20Firewall%20(WAF).pdf) for more pictures and information.
+
+## Docker Hub
+The project is available on docker hub [here](https://hub.docker.com/repository/docker/nineluj/py-waf).
+Pull the container locally with:
+```shell script
+docker pull docker.io/nineluj/py-waf
+```
+
 ## Setup for local development
 ## Running
 1. Create venv for Python 3.8 (in the root directory of the project)
