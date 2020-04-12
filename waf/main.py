@@ -1,23 +1,26 @@
 import logging
+from ssl import SSLContext
 
 import click
 from flask import Flask
+from gevent.pywsgi import WSGIServer
+from werkzeug.debug import DebuggedApplication
 
 from waf.modules.rate_limiter import RateLimiter
 from waf.modules.security_headers import SecurityHeaders
 from .helper import parse_config
 from .reverse_proxy import reverse_proxy
 
-# Static directory can be changed here to avoid collisions with underlying app's static directory
-app = Flask(__name__)
-
-USAGE = "Run with --help for options"
-app.register_blueprint(reverse_proxy)
-
 
 @click.command()
-@click.option('--config-path', '-c', help='Path to config file', metavar='PATH')
-def main(config_path) -> None:
+@click.option('--config-path', '-c', help='Path to config file', metavar='PATH', envvar='CONFIG_PATH')
+def main(config_path):
+    # Static directory can be changed here to avoid collisions with underlying app's static directory
+    app = Flask(__name__)
+
+    USAGE = "Run with --help for options"
+    app.register_blueprint(reverse_proxy)
+
     """Read the config"""
     if not config_path:
         print(USAGE)
@@ -35,10 +38,14 @@ def main(config_path) -> None:
     if app.config['use_ssl']:
         cert = app.config['ssl_cert']
         key = app.config['ssl_key']
-        security_context = (cert, key)
+        security_context = SSLContext()
+        security_context.load_cert_chain(cert, key)
 
     """Run the general modules"""
     SecurityHeaders(app)()
     RateLimiter(app)()
 
-    app.run(host='0.0.0.0', port=app.config['port'], debug=app.config['debug'], ssl_context=security_context)
+    app.logger.info(f"pyWaf running at 0.0.0.0:{app.config['port']}")
+    http_server = WSGIServer(('0.0.0.0', app.config['port']), DebuggedApplication(app) if app.config['debug'] else app,
+                             ssl_context=security_context)
+    http_server.serve_forever()
