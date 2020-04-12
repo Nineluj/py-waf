@@ -15,13 +15,13 @@ Blocked XSS
 
 Detecting password found in a breach (using HaveIBeenPwned API)
 
-![password_check](screenshots/breached_password.png)
+![password_check](artifacts/screenshots/breached_password.png)
 
 Detecting email address found in breach
 
-![email_check](screenshots/email_check.png)
+![email_check](artifacts/screenshots/email_check.png)
 
-See the [PDF](Web%20Application%20Firewall%20(WAF).pdf) for more pictures and information.
+See the [PDF](artifacts/Web_Application_Firewall_pyWAF.pdf) for more pictures and information.
 
 ## Docker Hub
 The project is available on docker hub [here](https://hub.docker.com/repository/docker/nineluj/py-waf).
