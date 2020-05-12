@@ -11,7 +11,7 @@
 ## Screenshots
 Blocked XSS
 
-![xss_detect](screenshots/xss_detect.png)
+![xss_detect](artifacts/screenshots/xss_detect.png)
 
 Detecting password found in a breach (using HaveIBeenPwned API)
 
